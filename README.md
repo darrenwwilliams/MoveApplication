@@ -16,11 +16,12 @@ Call the main entry point as
 
 from your applicationWillFinishLaunching function and that is all that is required. We suggest you wrap this in an #if statement so it only executes in your release copy. Our call looks like this:
 
-#if DEBUG
+```#if DEBUG
 //do nothing
 #else
 MoveApplication.toApplicationsFolder()
-#endif 
+#endif
+```
 
 References
 -------
