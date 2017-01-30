@@ -5,6 +5,8 @@ Requirements
 ------------
 Tested on MacOS 10.11 or higher. Any macOS running Swift 3.0.1 should be supported.
 
+Note that this code also uses a global logger object so you can simply replace the logger calls with "print" if you dont use a logging framework.
+
 Usage
 -----
 
