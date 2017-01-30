@@ -53,7 +53,7 @@ open class MoveApplication
         if (needsAuthorization) {
             
             if (!appleScriptCopy(source: bundleUrl,destination: destinationUrl)) {
-                logger.error("Failed to copy application")
+                print("Failed to copy application")
                 return
             }
             
@@ -65,13 +65,13 @@ open class MoveApplication
                 
                 //delete old version
                 if (!deleteFile(source: destinationUrl)) {
-                    logger.error("Failed to delete old application")
+                    print("Failed to delete old application")
                     return
                 }
                 
             }
             if (!copyBundle(source: bundleUrl,destination: destinationUrl)) {
-                logger.error("Failed to copy application")
+                print("Failed to copy application")
                 return
             }
             
@@ -164,7 +164,7 @@ open class MoveApplication
                 return
             }
             
-            logger.error("Failed to move file to trash: \(error.localizedDescription)")
+            print("Failed to move file to trash: \(error.localizedDescription)")
         }
     }
     
@@ -198,9 +198,7 @@ open class MoveApplication
     }
     
     /**
- 
-     Takes BSD style volume as the parameter as in /Volume/Some Volume
-     
+		Takes BSD style volume as the parameter as in /Volume/Some Volume
     */
     class func isDMGVolume(at: URL) -> Bool
     {
@@ -240,9 +238,8 @@ open class MoveApplication
     
     /**
         Uses Applescript to prompt for a file copy since swift api does not allow this for some reason.
-        I fail to see how asking for permission when copying is a security concern on a single one time task
-        like this. Opting to use this technique rather than linking in the deprecated ExecuteWithPrivileges
-        api in the security franework
+        Opting to use this technique rather than linking in the deprecated ExecuteWithPrivileges
+        api in the security framework.
     */
     class func appleScriptCopy(source: URL, destination: URL) -> Bool
     {
@@ -257,12 +254,12 @@ open class MoveApplication
             _ = scriptObject.executeAndReturnError(&errorDict)
             if errorDict != nil {
                 // script execution failed, handle error
-                logger.error("Error copying file: \(errorDict?.description)")
+                print("Error copying file: \(errorDict?.description)")
                 return false
             }
         } else {
             // script failed to compile, handle error
-            logger.error("Failed to execute copy script")
+            print("Failed to execute copy script")
             return false
         }
         
