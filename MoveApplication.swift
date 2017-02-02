@@ -12,7 +12,11 @@
 //
 //  - Make sure you also link the DiskArbitration framework to your project
 //
-//  1.0 January 30, 2017
+//  1.0.1 Feb 1, 2017
+//	- Avoid problems with translocation when trashing file
+//	- Issue a hard exit since the rest of the app is not initialized yet
+//
+//  1.0.0 Jan 30, 2017
 //  - Initial release
 
 import Cocoa
@@ -81,7 +85,7 @@ open class MoveApplication
         
         //trash the source file if started from wrong location
         if (!isDMG && !isNestedApplication) {
-            //this is an async task
+            //prevent user from running it here again
             trashFile(source: bundleUrl)
         }
         // Relaunch
@@ -91,8 +95,8 @@ open class MoveApplication
         if isDMG {
             unmountVolume(at: volumeUrl)
         }
-        
-        NSApplication.shared().terminate(self)
+        // Hard exit since we have not initialized anything in main app
+        exit(0)
     }
 
     class func isApplicationAtPathNested(_ path: URL) -> Bool
@@ -157,15 +161,34 @@ open class MoveApplication
         return true
     }
     
+    /**
+        Using applescript to move the file to the trash and avoid problems with translocation on 
+        macOS Sierra
+    */
     class func trashFile(source: URL)
     {
-        NSWorkspace.shared().recycle([source]) { trashedFiles, error in
-            guard let error = error else {
+        var command = "set theFile to POSIX file \""
+        command.append(source.path)
+        command.append("\" \n")
+        command.append("tell application \"Finder\" \n")
+        command.append("move theFile to trash \n")
+        command.append("end tell")
+        
+        if let scriptObject = NSAppleScript(source: command) {
+            var errorDict: NSDictionary? = nil
+            _ = scriptObject.executeAndReturnError(&errorDict)
+            if errorDict != nil {
+                // script execution failed, handle error
+                logger.error("Error moving file to trash: \(errorDict?.description)")
                 return
             }
-            
-            print("Failed to move file to trash: \(error.localizedDescription)")
+        } else {
+            // script failed to compile, handle error
+            logger.error("Failed to execute copy script")
+            return
         }
+        
+        return
     }
     
     /**

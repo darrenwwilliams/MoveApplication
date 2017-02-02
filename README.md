@@ -27,7 +27,10 @@ Public domain
 Version History
 ---------------
 
-* 1.00
+* 1.0.1
+	- Initial release for Swift 3.0 and support for macOS Sierra and earlier
+	
+* 1.0.0
 	- Initial release for Swift 3.0 and support for macOS Sierra and earlier
 	
 Contributors:
